@@ -1,0 +1,436 @@
+openapi: "3.0.0"
+info:
+  title: Jouer Flux
+  description: "API to handle firewalls"
+  version: 1.0.0
+tags:
+  - name: Firewalls
+    description: Manage firewalls
+  - name: Filtering Policies
+    description: Manage filtering policies
+  - name: Rules
+    description: Manage rules
+  - name: Health
+    description: API checkhealth endpoints
+paths:
+  /firewalls:
+    post:
+      tags:
+        - Firewalls
+      summary: Add a firewall
+      description: Add a firewall
+      operationId: app.endpoints.firewall_endpoints.add_firewall
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FirewallInfo"
+      responses:
+        "201":
+          description: "Firewall successfully added"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Firewall"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+  /firewalls/{id}:
+    get:
+      tags:
+        - Firewalls
+      summary: Get a firewall
+      description: Retrieve a firewall using its ID
+      operationId: app.endpoints.firewall_endpoints.get_firewall
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: the firewall ID
+      responses:
+        "200":
+          description: "The corresponding firewall"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Firewall"
+        "404":
+          description: "Firewall not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+    delete:
+      tags:
+        - Firewalls
+      summary: Delete a firewall
+      description: Delete a firewall using its ID
+      operationId: app.endpoints.firewall_endpoints.delete_firewall
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: the firewall ID
+      responses:
+        "204":
+          description: "Firewall deleted"
+  /firewalls/{firewall_id}/filtering_policies:
+    post:
+      tags:
+        - Filtering Policies
+      summary: Add a filtering policy
+      description: Add a filtering policy
+      operationId: app.endpoints.filtering_policy_endpoints.add_filtering_policy
+      parameters:
+        - in: path
+          name: firewall_id
+          required: true
+          schema:
+            type: integer
+          description: the firewall ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FilteringPolicyInfo"
+      responses:
+        "201":
+          description: "Filtering policy successfully added"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailedFilteringPolicy"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+        "404":
+          description: "Firewall not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+    get:
+      tags:
+        - Filtering Policies
+      summary: Get firewall's filtering policies
+      description: Get firewall's filtering policies
+      operationId: app.endpoints.filtering_policy_endpoints.get_filtering_policies
+      parameters:
+        - in: path
+          name: firewall_id
+          required: true
+          schema:
+            type: integer
+          description: the firewall ID
+      responses:
+        "200":
+          description: "The Firewall's policies"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FirewallFilteringPolicies"
+        "404":
+          description: "Firewall not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+  /filtering_policies/{id}:
+    get:
+      tags:
+        - Filtering Policies
+      summary: Retrieve a filtering policy
+      description: Retrieve a filtering_policy using its ID
+      operationId: app.endpoints.filtering_policy_endpoints.get_filtering_policy
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: the filtering policy ID
+        - in: query
+          name: show_rules
+          schema:
+            type: boolean
+          description: Show the filtering policy's rules
+      responses:
+        "200":
+          description: "The corresponding filtering policy"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FilteringPolicy"
+        "404":
+          description: "Filtering policy not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+    delete:
+      tags:
+        - Filtering Policies
+      summary: Delete a filtering policy
+      description: Delete a filtering policy using its ID
+      operationId: app.endpoints.filtering_policy_endpoints.delete_filtering_policy
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: the filtering policy ID
+      responses:
+        "204":
+          description: "Filtering policy deleted"
+  /filtering_policies/{filtering_policy_id}/rules:
+    post:
+      tags:
+        - Rules
+      summary: Add a rule to a filtering policy
+      description: Add a rule to a filtering policy
+      operationId: app.endpoints.rule_endpoints.add_rule
+      parameters:
+        - in: path
+          name: filtering_policy_id
+          required: true
+          schema:
+            type: integer
+          description: the filtering policy ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RuleInfo"
+      responses:
+        "201":
+          description: "Rule successfully added"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailedRule"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+        "404":
+          description: "Filtering policy not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+  /rules/{id}:
+    delete:
+      tags:
+        - Rules
+      summary: Delete a rule
+      description: Delete a rule using its ID
+      operationId: app.endpoints.rule_endpoints.delete_rule
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The rule ID
+      responses:
+        "204":
+          description: "Rule deleted"
+    get:
+      tags:
+        - Rules
+      summary: Retrieve a rule
+      description: Retrieve a rule using its ID
+      operationId: app.endpoints.rule_endpoints.get_rule
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The rule ID
+      responses:
+        "200":
+          description: "The rule"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailedRule"
+        "404":
+          description: "Rule not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Check if API is alive
+      description: Check if API is alive
+      operationId: app.endpoints.health_endpoints.get_health
+      responses:
+        "204":
+          description: "OK"
+
+components:
+  schemas:
+    FirewallInfo:
+      type: object
+      required:
+        - name
+        - ip_address
+        - port
+      properties:
+        name:
+          type: string
+          example: "A firewall"
+        ip_address:
+          type: string
+          format: ipv4
+          example: "127.0.0.1"
+        port:
+          type: integer
+          format: int32
+          example: 8000
+    Firewall:
+      allOf:
+        - $ref: "#/components/schemas/FirewallInfo"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+    FirewallFilteringPolicies:
+      allOf:
+        - $ref: "#/components/schemas/Firewall"
+        - type: object
+          properties:
+            filtering_policies:
+              type: array
+              items:
+                $ref: "#/components/schemas/FilteringPolicy"
+    FilteringPolicyInfo:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "A filtering policy"
+        previous_filtering_policy_id:
+          type: integer
+          example: 1
+    FilteringPolicy:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    DetailedFilteringPolicy:
+      allOf:
+        - $ref: "#/components/schemas/FilteringPolicy"
+      type: object
+      properties:
+        firewall:
+          $ref: "#components/schemas/Firewall"
+    RuleInfo:
+      type: object
+      required:
+        - source_ip
+        - destination_ip
+        - destination_port
+        - protocol
+        - action
+      properties:
+        previous_rule_id:
+          type: integer
+          example: "1"
+        name:
+          type: string
+          example: "Allow SSH"
+        source_ip:
+          type: string
+          format: ipv4
+          example: "0.0.0.0"
+        destination_ip:
+          type: string
+          format: ipv4
+          example: "0.0.0.0"
+        destination_port:
+          type: integer
+          example: "22"
+        protocol:
+          type: string
+          enum:
+            - ANY
+            - TCP
+            - UDP
+            - ICMP
+          example: TCP
+        action:
+          type: string
+          enum:
+            - DENY
+            - ALLOW
+          example: ALLOW
+    DetailedRule:
+      type: object
+      properties:
+        previous_rule_id:
+          type: integer
+          example: "1"
+        name:
+          type: string
+          example: "Allow SSH"
+        source_ip:
+          type: string
+          format: ipv4
+          example: "0.0.0.0"
+        destination_ip:
+          type: string
+          format: ipv4
+          example: "0.0.0.0"
+        destination_port:
+          type: integer
+          example: "22"
+          type: string
+          format: ipv4
+          example: "0.0.0.0"
+        protocol:
+          type: string
+          enum:
+            - ANY
+            - TCP
+            - UDP
+            - ICMP
+          example: TCP
+        action:
+          type: string
+          enum:
+            - DENY
+            - ALLOW
+          example: ALLOW
+        filtering_policy:
+          $ref: "#/components/schemas/DetailedFilteringPolicy"
+    Errors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
