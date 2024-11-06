@@ -46,6 +46,7 @@ This API was made in a short time and lacks a lot of features:
 - Documentation
 - Authentication
 - Pagination
+- Sensitive data encryption
 - Better Error Handling
 - Logs
 - Tests
